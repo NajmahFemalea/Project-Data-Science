@@ -48,17 +48,36 @@ Dengan menggunakan fungsi **duplicated().sum()** pada library pandas diketahui b
 
 ## - Data Preparation
 Pada tahap ini penting dilakukan sebelum memulai pemodelan yang digunakan untuk memformat ulang atau merestrukturisasi data, dan akhirnya menggabungkan data untuk dianalisis. 
-
+### - Data Preparation untuk Content-Based Filtering.
 1. Normalisasi pada Fitur Rating<br>
 Karena fitur **Rating** bertipe data float yang memiliki banyak desimal, ini bisa dianggap sebagai noise dalam beberapa konteks. Maka, bulatkan dengan 1 angka dibelakang koma untuk mengurangi gangguan ini. Sehingga dari data yang bernilai 1.043159 menjadi 1.0.
 2. Ubah Fitur<br>
 Ada beberapa hal yang diubah yaitu :<br>
-    - Ubah Nama Fitur <br>
+    - Nama Fitur <br>
     Karena nama fitur yang tidak memiliki format yang tepat, maka ubah nama fitur agar tidak ada spasi dan huruf kecil semua, seperti kolom 'Product ID' menjadi 'product_id' dan seterusnya.
-    - Ubah nilai yang ada di fitur product dan user<br>
+    - Nilai pada fitur product dan user<br>
     Karena pada nilai tersebut hanya berisikan angka agar lebih mudah dibaca dan dipahami, mengubah nilai dari Product ID dan User ID agar memiliki prefix product_ atau user_ di depan setiap nilainya.
-3. Feature Engineering
-- Content Based Filtering hanya menggunakan fitur **product_name, category, price, brand, color dan size**, karena Metode ini fokus pada features (atribut) dari produk untuk merekomendasikan produk yang mirip dengan produk yang pernah diinteraksi oleh pengguna. Representasi atribut dilakukan dengan metode TF-IDF pada product_name dan One-Hot Encoding untuk atribut kategorikal seperti category dan brand. <br>
+3. Feature Engineering<br>
+Fitur yang Digunakan:
+Fitur yang relevan adalah product_name, category, price, brand, color, dan size, karena Content-Based Filtering fokus pada atribut produk.
+4. TF-IDF Vectorizer<br>
+Representasi teks (contoh: product_name) dilakukan dengan TF-IDF Vectorizer untuk mendapatkan matriks numerik. Matriks jarang (sparse matrix) kemudian diubah menjadi matriks penuh (dense matrix).
+
+### - Data Preparation untuk Content-Based Filtering.
+1. Feature Engineering<br>
+Fitur yang digunakan adalah user_id, rating, product_name, dan product_id karena metode ini fokus pada interaksi antara pengguna dan produk.
+2. Data Encoding<br>
+    - Mengubah Data menjadi Unique List:<br>
+    Kolom user_id dan product_id dibuat menjadi daftar unik.
+    - Mapping Data:<br>
+    Setiap nilai ID diubah menjadi format numerik melalui proses encoding. Contoh: user_123 menjadi 0, product_456 menjadi 1, dan seterusnya.
+3. Normalisasi Rating<br>
+Nilai rating dinormalisasi ke rentang 0 hingga 1 untuk menjaga konsistensi selama pelatihan.
+4. Split Data<br>
+    - Dataset diacak untuk menghindari bias urutan.
+    - Dataset dibagi menjadi training set (80%) dan validation set (20%) menggunakan fungsi train_test_split.
+    - Fitur X: user_id dan product_id
+    - Fitur y: rating
 
 ## - Pemodelan
 **1. Content Based Filtering**
@@ -76,16 +95,13 @@ Ada beberapa hal yang diubah yaitu :<br>
   - Ketergantungan pada fitur item:
     Jika atribut atau fitur item tidak lengkap atau kurang representatif, kualitas rekomendasi akan menurun.
 
-- Training
+- Training Model<br>
     - Mengambil data<br>
     Mengambil 5 sampel secara acak menggunakan fungsi sample() menggunakan enam fitur yang sudah ditentukan tadi, sebagai berikut:
       ![image](https://github.com/user-attachments/assets/f750727c-1e3e-451c-9bac-b2abc35bb821)
     
-    - TF-TDF Vectorizer<br>
-    Menggunakan TfidfVectorizer dari library scikit-learn untuk memproses teks menjadi representasi numerik (vektor TF-IDF) dari data product_name yang menghasilkan matriks dengan 1000 baris dan 5 kolom. Lalu mengubah matriks jarang (sparse matrix) menjadi matriks penuh (dense matrix) dan disimpan di dalam dataframe. 
-    
-    - Cosine Silimarity<br>
-    Pendekatan Content-Based Filtering menggunakan informasi atribut produk untuk memberikan rekomendasi berdasarkan kemiripan antar produk. Model ini bekerja dengan menggunakan Cosine Similarity sebagai metrik untuk mengukur kesamaan antar produk yang direpresentasikan dalam matriks kesamaan (similarity matrix).
+    - Pendekatan Model<br>
+        - Cosine Similarity: Pendekatan Content-Based Filtering menggunakan informasi atribut produk untuk memberikan rekomendasi berdasarkan kemiripan antar produk. Model ini bekerja dengan menggunakan Cosine Similarity sebagai metrik untuk mengukur kesamaan antar produk yang direpresentasikan dalam matriks kesamaan (similarity matrix).
         - Matriks Similarity: Matriks ini sebelumnya telah dihitung menggunakan TF-IDF (untuk atribut teks) atau metode representasi lain untuk atribut produk. Matriks berisi nilai kesamaan antara setiap pasangan produk, dengan nilai antara 0 hingga 1. Semakin tinggi nilai cosine similarity, semakin mirip dua produk tersebut.
      
     - Mendapatkan Rekomendasi<br>
@@ -117,23 +133,8 @@ Ada beberapa hal yang diubah yaitu :<br>
   - Masalah skalabilitas:
     Ketika jumlah pengguna atau item bertambah sangat besar, proses pencocokan (similarity computation) menjadi mahal secara komputasi.
 
-- Training
-    - Feature Engineering<br>
-    Collaborative Filtering menggunakan fitur **user_id, rating, product_name, dan product_id**, karena Metode ini fokus pada pola interaksi antara pengguna dan produk untuk membuat rekomendasi, berdasarkan data eksplisit seperti Rating atau data historis pembelian. Lalu ntuk mempermudah pemrosesan oleh model TensorFlow, dilakukan encoding pada kolom user_id dan product_id.
-    - Pendekatan Collaborative Filtering menggunakan model deep learning berbasis TensorFlow untuk mempelajari hubungan antara pengguna dan produk. Model ini memanfaatkan embeddings untuk merepresentasikan pengguna dan produk dalam ruang vektor:
-        1. Data Encoding:
-            - ID pengguna (user_id) dan produk (product_id) diubah menjadi format numerik melalui proses encoding, menghasilkan peta antara ID asli ke nilai numerik.
-            - Peta ini digunakan untuk memastikan data input model memiliki format numerik yang sesuai.
-        2. Normalisasi Rating:
-        Rating produk dinormalisasi ke dalam skala 0 hingga 1 untuk memastikan model bekerja secara konsisten.
-         3. Split Data:<br>
-            - Mengacak Dataset<br>
-              Mengacak dataset (shuffling data) agar data tidak memiliki urutan yang berpotensi memengaruhi hasil analisis atau pelatihan model.
-            - Split data<br>
-              Data dibagi menjadi training set dan validation set dengan rasio 80:20 menggunakan train_test_split untuk melatih dan mengevaluasi model. Dimana: <br>
-              - fitur X nya adalah customer dan product
-              - fitur y nya adalah rating.
-    - Training model<br>
+- Training Model<br>
+    - Pendekatan Model<br>
         1. Arsitektur Model RecommenderNet:<br>
         - Model terdiri dari:
             - User Embedding Layer: Mempelajari representasi pengguna dalam ruang vektor.
@@ -146,7 +147,7 @@ Ada beberapa hal yang diubah yaitu :<br>
           - Metrics: Root Mean Squared Error (RMSE) untuk mengukur performa model.
           - Epoch: 100, model akan melakukan iterasi 100 kali.
         - Visualisasi Metrik:
-        Grafik pelatihan pada nilai training dan validation loss dapat dilihat pada gambar berikut:
+        Grafik pelatihan pada nilai training dan validation loss dapat dilihat pada gambar berikut:<br>
         ![image](https://github.com/user-attachments/assets/ba034279-918a-48c3-84eb-88ab8e9fa5ce)
     
         2. Prediksi Rekomendasi:
