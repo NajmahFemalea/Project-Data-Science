@@ -19,17 +19,19 @@ Berikut ini adalah jumlah gambar per kelas:
     - Ukuran input model yang digunakan adalah (150 x 150 x 3), sesuai dengan dimensi gambar dalam dataset.
 2. **Menggunakan 20 Layer Terakhir dari Model VGG16**
 Hanya 20 layer terakhir dari VGG16 yang difinetune, sementara layer sebelumnya dibekukan untuk mempertahankan fitur yang telah dipelajari.
-3. **Flatten Layer**
+3. **Conv2D**
+Menambahkan lapisan Conv2D dengan 32 filter dan 64 filter berukuran (3,3) dan fungsi aktivasi ReLU serta padding 'same'. Setelah itu, model dilanjutkan dengan lapisan MaxPooling2D berukuran (2,2).
+5. **Flatten Layer**
 Menggunakan GlobalAveragePooling2D untuk mereduksi dimensi sebelum masuk ke fully connected layer.
-4. **Fully Connected Layer**
+6. **Fully Connected Layer**
     - Menambahkan Dropout layer (0.5) untuk mengurangi risiko overfitting.
     - Dense layer dengan 256 unit dan aktivasi ReLU 
     - Output layer menggunakan Dense layer dengan 4 unit (sesuai jumlah kelas) dan aktivasi softmax untuk menghasilkan probabilitas tiap kelas.
-5. **Kompilasi Model**
+7. **Kompilasi Model**
     - Menggunakan **Adam optimizer** dengan learning rate sebesar 1e-4 untuk optimasi parameter.
     - Loss function yang digunakan adalah **categorical crossentropy**, sesuai untuk klasifikasi multi-kelas.
     - Metrik evaluasi utama adalah akurasi untuk mengukur kinerja model dalam membedakan kelas MRI.
-6. **Callback**
+8. **Callback**
 Callback digunakan untuk mengontrol proses pelatihan agar lebih optimal dan mencegah overfitting. Callback yang digunakan antara lain:
     - **Custom Callback (myCallback)**
         Menghentikan pelatihan jika accuracy dan val_accuracy telah mencapai lebih dari 95%.
