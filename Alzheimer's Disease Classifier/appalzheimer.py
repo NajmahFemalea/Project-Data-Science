@@ -6,6 +6,7 @@ import tensorflow as tf
 import time
 import os
 import pandas as pd
+import gdown
 
 # -----------------------
 # CONFIGURATION
@@ -16,6 +17,9 @@ UPLOAD_ICON_URL = "https://img.icons8.com/fluency/48/upload.png"
 BG_URL = "https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=1600&q=80&auto=format&fit=crop"  
 
 MODEL_PATH = "best_model.h5"
+FILE_ID = "1JLB1DxdwMWgAKM2dpoF0V-Heja-ePbGO"
+DRIVE_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
+
 MODEL_INPUT_SIZE = (150, 150)
 CLASS_NAMES = [
     "MildDemented",
@@ -77,17 +81,21 @@ mereka yang berusia lebih dari 60 tahun (lansia) (halodoc.com, 2023)
 """)
 
 # Load model
-@st.cache_resource(show_spinner=False)
-def load_local_model(path):
-    if not os.path.exists(path):
-        return None, f"Model file not found at: {path}"
+@st.cache_resource(show_spinner=True)
+def load_model():
     try:
-        model = tf.keras.models.load_model(path)
+        # Download model kalau belum ada
+        if not os.path.exists(MODEL_PATH):
+            with st.spinner("Downloading model from Google Drive..."):
+                gdown.download(DRIVE_URL, MODEL_PATH, quiet=False)
+        
+        # Load model
+        model = tf.keras.models.load_model(MODEL_PATH)
         return model, None
     except Exception as e:
         return None, f"Error loading model: {e}"
 
-model, model_error = load_local_model(MODEL_PATH)
+model, model_error = load_model()
 
 # Preprocessing
 def preprocess_image(pil_img, target_size):
