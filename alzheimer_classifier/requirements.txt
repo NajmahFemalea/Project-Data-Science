@@ -1,6 +1,6 @@
-gdown
-numpy
-pandas
-pillow
-tensorflow
-streamlit
+gdown==5.2.0
+numpy==1.24.3
+pandas==2.2.2
+pillow==11.1.0
+tensorflow==2.15.0
+streamlit==1.22.0
