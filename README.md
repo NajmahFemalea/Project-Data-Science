@@ -87,3 +87,5 @@ Inference menggunakan TF Serving
     ```sh
     (http://localhost:8501/v1/moodels/klasifikasi_mri) 
     ```
+
+Atau dapat langsung mengakses web dengan link [berikut](https://alzheimer-disease.streamlit.app/)
